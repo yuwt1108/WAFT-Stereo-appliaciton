@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A7D5E114-373F-4123-855C-557CA6C68D07}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup>
+    <OpenCVRoot>D:\Ywt\opencv-4_12_0-cuda-contrib</OpenCVRoot>
+    <LibTorchRoot>D:\Ywt\libtorch_121</LibTorchRoot>
+    <CudaRoot>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1</CudaRoot>
+    <WaftRoot>$(MSBuildProjectDirectory.Replace('\', '/'))</WaftRoot>
+    <OutDir>$(MSBuildProjectDirectory)\build\vs\$(Configuration)\</OutDir>
+    <IntDir>$(OutDir)obj\</IntDir>
+    <LocalDebuggerWorkingDirectory>$(MSBuildProjectDirectory)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerEnvironment>Path=$(LibTorchRoot)\lib;$(OpenCVRoot)\x64\vc16\bin;$(CudaRoot)\bin;$(Path)</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <Optimization>MaxSpeed</Optimization>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(OpenCVRoot)\include;$(LibTorchRoot)\include;$(LibTorchRoot)\include\torch\csrc\api\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WAFT_PROJECT_DIR=&quot;$(WaftRoot)&quot;;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>$(OpenCVRoot)\x64\vc16\lib;$(LibTorchRoot)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_world4120.lib;torch.lib;torch_cpu.lib;c10.lib;torch_cuda.lib;c10_cuda.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/INCLUDE:?warp_size@cuda@at@@YAHXZ %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="src\depth_result_handler.hpp" />
+    <ClInclude Include="src\stereo.hpp" />
+    <ClInclude Include="src\stereo_frame_processor.hpp" />
+    <ClCompile Include="src\depth_result_handler.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\stereo.cpp" />
+    <ClCompile Include="src\stereo_frame_processor.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

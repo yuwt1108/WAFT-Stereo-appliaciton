@@ -6,8 +6,8 @@
 
 ## 在 VS 中运行
 
-1. 打开 `build/WAFTStereo.sln`；提示工程有外部修改时选择重新加载。
-2. 选择 **Release / x64**，将 `waft_stereo` 设为启动项目，调试命令参数留空。
+1. 打开本目录的 [`WAFTStereo.sln`](WAFTStereo.sln)，其中只有 `waft_stereo` 一个项目，代码按「头文件」和「源文件」分组。
+2. 使用 **Release / x64**，调试命令参数留空。按本机安装位置设置 `waft_stereo.vcxproj` 中的依赖路径，并准备兼容的 TorchScript 模型。
 3. 按 **Ctrl+F5**，程序从 `main.cpp` 执行，保存结果并打开深度窗口。
 
 主入口不再解析命令参数或提供分阶段命令。VS 构建通过 `Directory.Build.targets` 自动处理重复的 Path 环境项，调试环境已配置动态库路径。
@@ -52,16 +52,17 @@ cv::Mat values = waft_stereo::process_frames(left, right);
 | `src/stereo_frame_processor.hpp/.cpp` | 接收两个 cv::Mat，组织完整深度处理流程 |
 | `src/stereo.hpp/.cpp` | 校正、模型加载与预处理、推理、视差转深度 |
 | `src/depth_result_handler.hpp/.cpp` | NPY/图片读写、结果保存和点击窗口 |
-| `CMakeLists.txt` | VS2019/C++17 构建和调试配置 |
+| `WAFTStereo.sln`、`waft_stereo.vcxproj`、`waft_stereo.vcxproj.filters` | 单项目 VS 解决方案、依赖配置和头文件／源文件分组 |
+| `CMakeLists.txt` | 原 CMake 构建入口 |
 | `Directory.Build.targets` | VS 构建前处理重复的 Path 环境项 |
 
 ## 环境与模型
 
-VS2019/v142、x64 Release、C++17、OpenCV 4.12、LibTorch 2.5/CUDA 12.1，需要 CUDA GPU。依赖路径在 `CMakeLists.txt` 中设置。
+VS2019/v142、x64 Release、C++17、OpenCV 4.12、LibTorch 2.5/CUDA 12.1，需要 CUDA GPU。VS 方案的依赖路径在 `waft_stereo.vcxproj` 中设置，生成的程序位于 `build/vs/Release/`。使用 CMake 时，依赖路径在 `CMakeLists.txt` 中设置。
 
 程序当前加载 `data/model/waft_B.pt`。在 `main()` 中修改 `model_path` 即可切换模型，例如改成 `data/model/waft_L.pt`，然后重新编译。调用为 `process_frames(left, right, output, inference_size, model_path)`；省略模型路径时默认使用 B 版。同一路径连续处理帧时复用模型。LibTorch 原生加载，运行时不调用 Python。`tools/export_model.py` 用于更换权重时导出，需要父目录的 Python 模型源码与 .pth 权重。
 
-两参数调用 `process_frames(left, right)` 只返回深度；主程序使用带输出目录的调用，同时保存中间预览。旧的分阶段命令、历史验证目录和 PowerShell 启动脚本已清理。`build` 保留当前 VS 解决方案和构建所需文件。
+两参数调用 `process_frames(left, right)` 只返回深度；主程序使用带输出目录的调用，同时保存中间预览。`build` 由构建过程在本地生成。
 
 当前深度计算筛选正的有限视差，尚未过滤校正黑边和非重叠区域；数值核对不代表实物测距精度验证。
 
@@ -73,9 +74,8 @@ VS2019/v142、x64 Release、C++17、OpenCV 4.12、LibTorch 2.5/CUDA 12.1，需�
 
 ## GitHub发布版本的数据与权重
 
-本仓库不附带data实际数据，只保留目录结构；克隆后请按[data/README.md](data/README.md)放置原始左右图，并按[data/model/README.md](data/model/README.md)准备模型。官方权重入口为[WAFT-Stereo](https://github.com/princeton-vl/WAFT-Stereo#weights-on-huggingface)及[Hugging Face SynLarge](https://huggingface.co/MemorySlices/WAFT-Stereo/tree/main/SynLarge)。官方`.pth`需转换为当前C++接口兼容的TorchScript `.pt`，不能仅更名。
+仓库附带 `1021_50cm` 左右示例图。更换输入请参照 [数据说明](data/README.md)，模型请按 [模型说明](data/model/README.md) 准备。官方权重入口为[WAFT-Stereo](https://github.com/princeton-vl/WAFT-Stereo#weights-on-huggingface)及[Hugging Face SynLarge](https://huggingface.co/MemorySlices/WAFT-Stereo/tree/main/SynLarge)。官方`.pth`需转换为当前C++接口兼容的TorchScript `.pt`，不能仅更名。
 
-本仓库不包含build目录。请从仓库根目录执行`cmake -S C++ -B C++/build -G "Visual Studio 16 2019" -A x64`生成VS解决方案，按本机路径设置依赖后再构建。
 
 ## 前期相机标定
 

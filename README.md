@@ -39,14 +39,16 @@
 
 ## 构建和启动
 
-先安装所需依赖，并按本机位置修改`C++/CMakeLists.txt`中的OpenCV、LibTorch和CUDA路径。然后在仓库根目录生成VS工程：
+1. 打开 [`C++/WAFTStereo.sln`](C++/WAFTStereo.sln)。解决方案只有 `waft_stereo` 一个项目，代码按「头文件」和「源文件」分组。
+2. 根据本机安装位置，修改 `C++/waft_stereo.vcxproj` 中的 `OpenCVRoot`、`LibTorchRoot`、`CudaRoot`，并准备兼容的 TorchScript 模型。示例图片已随仓库提供。
+3. 使用 **Release / x64**，按 **Ctrl+F5** 构建并运行。程序输出到 `C++/build/vs/Release/`，VS 调试配置已设置依赖 DLL 的搜索路径。
+
+如需使用原 CMake 构建方式，请在 `C++/CMakeLists.txt` 设置依赖路径，再从仓库根目录执行：
 
 ```powershell
 cmake -S C++ -B C++/build -G "Visual Studio 16 2019" -A x64
 cmake --build C++/build --config Release --target waft_stereo -- /m:1
 ```
-
-打开`C++/build/WAFTStereo.sln`，选择Release/x64、将`waft_stereo`设为启动项目，再运行。示例图片已包含在仓库中，需自行准备兼容的TorchScript模型。VS调试配置包含依赖DLL搜索路径。
 
 ## 前期相机标定
 
